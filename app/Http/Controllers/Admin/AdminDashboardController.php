@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Task;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class AdminDashboardController extends Controller
+{
+    public function index(Request $request)
+    {
+        $user = Auth::user();
+
+        // Admin can see all tasks
+        $tasks = Task::with(['user', 'assignedUser'])->get();
+
+        // Count tasks by status
+        $totalTasks = $tasks->count();
+        $selesai = $tasks->where('status', 'Selesai')->count();
+        $dalamProses = $tasks->where('status', 'Dalam Proses')->count();
+        $menunggu = $tasks->where('status', 'Menunggu')->count();
+        $terlambat = $tasks->where('status', 'Terlambat')->count();
+
+        // Get selected date or default to today
+        $selectedDate = $request->has('date') ? Carbon::parse($request->date) : Carbon::today();
+
+        // Get tasks for selected date
+        $selectedDateTasks = $tasks->filter(function ($task) use ($selectedDate) {
+            return Carbon::parse($task->due_date)->isSameDay($selectedDate);
+        });
+
+        // Get tasks for the week
+        $startOfWeek = Carbon::now()->startOfWeek();
+        $weekTasks = collect();
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startOfWeek->copy()->addDays($i);
+            $count = $tasks->filter(function ($task) use ($date) {
+                return Carbon::parse($task->due_date)->isSameDay($date);
+            })->count();
+
+            $weekTasks->push([
+                'date' => $date,
+                'count' => $count,
+                'day' => $date->locale('id')->isoFormat('ddd'),
+                'isSelected' => $selectedDate->isSameDay($date),
+            ]);
+        }
+
+        // Count total users (excluding admin)
+        $totalUsers = User::where('role', 'user')->count();
+
+        // Get all users for assign dropdown
+        $users = User::all();
+
+        return view('admin.dashboard', compact(
+            'totalTasks',
+            'selesai',
+            'dalamProses',
+            'menunggu',
+            'terlambat',
+            'selectedDateTasks',
+            'selectedDate',
+            'weekTasks',
+            'totalUsers',
+            'users'
+        ));
+    }
+
+    public function storeTask(Request $request)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|min:3|max:255',
+                'description' => 'required|string|min:10',
+                'assigned_to' => 'required|exists:users,id',
+                'priority' => 'required|in:Sedang,Tinggi',
+                'due_date' => 'required|date|after_or_equal:today',
+            ], [
+                'title.required' => 'Judul task wajib diisi',
+                'title.min' => 'Judul task minimal 3 karakter',
+                'description.required' => 'Deskripsi wajib diisi',
+                'description.min' => 'Deskripsi minimal 10 karakter',
+                'assigned_to.required' => 'Assign ke harus dipilih',
+                'assigned_to.exists' => 'User yang dipilih tidak valid',
+                'priority.required' => 'Prioritas wajib dipilih',
+                'due_date.required' => 'Deadline wajib diisi',
+                'due_date.after_or_equal' => 'Deadline tidak boleh kurang dari hari ini',
+            ]);
+
+            // Admin's task automatically goes to "Dalam Proses"
+            Task::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'status' => 'Dalam Proses',
+                'priority' => $request->priority,
+                'due_date' => $request->due_date,
+                'user_id' => Auth::id(),
+                'assigned_to' => $request->assigned_to,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task berhasil ditambahkan!'
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan task: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateTask(Request $request, Task $task)
+    {
+        try {
+            $request->validate([
+                'title' => 'required|string|min:3|max:255',
+                'description' => 'required|string|min:10',
+                'assigned_to' => 'required|exists:users,id',
+                'priority' => 'required|in:Sedang,Tinggi',
+                'due_date' => 'required|date|after_or_equal:today',
+                'status' => 'required|in:Menunggu,Dalam Proses,Selesai,Terlambat',
+            ], [
+                'title.required' => 'Judul task wajib diisi',
+                'title.min' => 'Judul task minimal 3 karakter',
+                'description.required' => 'Deskripsi wajib diisi',
+                'description.min' => 'Deskripsi minimal 10 karakter',
+                'assigned_to.required' => 'Assign ke harus dipilih',
+                'assigned_to.exists' => 'User yang dipilih tidak valid',
+                'priority.required' => 'Prioritas wajib dipilih',
+                'due_date.required' => 'Deadline wajib diisi',
+                'due_date.after_or_equal' => 'Deadline tidak boleh kurang dari hari ini',
+                'status.required' => 'Status wajib dipilih',
+            ]);
+
+            $task->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'priority' => $request->priority,
+                'due_date' => $request->due_date,
+                'assigned_to' => $request->assigned_to,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task berhasil diupdate!'
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->validator->errors()->first()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengupdate task: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function approveTask(Request $request, Task $task)
+    {
+        try {
+            // Only approve tasks that are in "Menunggu" status
+            if ($task->status !== 'Menunggu') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Task ini sudah diproses'
+                ], 400);
+            }
+
+            $task->update([
+                'status' => 'Dalam Proses'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task berhasil di-approve!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal approve task: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+}
