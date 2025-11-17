@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Semua Task')
+@section('title', 'Semua Task - Admin')
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -17,13 +17,13 @@
             </div>
 
             <nav class="space-y-2">
-                <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
                     Dashboard
                 </a>
-                <a href="{{ route('user.tasks') }}" class="flex items-center gap-3 px-4 py-3 bg-gray-100 text-gray-800 rounded-lg font-medium">
+                <a href="{{ route('admin.all-tasks') }}" class="flex items-center gap-3 px-4 py-3 bg-gray-100 text-gray-800 rounded-lg font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -31,9 +31,9 @@
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
-                    Pengumuman
+                    Pengguna
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@
             </div>
         @endif
 
-        <!-- Stats Cards -->
+        <!-- Stats Section -->
         <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
             <h3 class="text-lg font-bold text-gray-800 mb-2">Semua Task</h3>
             <p class="text-sm text-gray-600 mb-6">Kelola dan pantau semua task dalam sistem</p>
@@ -125,7 +125,7 @@
             <p class="text-sm text-gray-600 mb-6">Kelola dan pantau semua task dalam sistem</p>
             
             <!-- Filter Section -->
-            <form action="{{ route('user.tasks') }}" method="GET" class="mb-6">
+            <form action="{{ route('admin.all-tasks') }}" method="GET" class="mb-6">
                 <div class="grid grid-cols-4 gap-4">
                     <!-- Search -->
                     <div>
@@ -149,8 +149,8 @@
                     
                     <!-- Status Filter -->
                     <div>
-                        <select name="status"
-                                onchange="this.form.submit()" 
+                        <select name="status" 
+                                onchange="this.form.submit()"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
                             <option value="">Semua Status</option>
                             <option value="Menunggu" {{ request('status') == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
@@ -162,8 +162,8 @@
                     
                     <!-- Priority Filter -->
                     <div>
-                        <select name="priority"
-                                onchange="this.form.submit()" 
+                        <select name="priority" 
+                                onchange="this.form.submit()"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
                             <option value="">Semua Prioritas</option>
                             <option value="Sedang" {{ request('priority') == 'Sedang' ? 'selected' : '' }}>Sedang</option>
@@ -175,8 +175,8 @@
                 <div class="flex gap-4 mt-4 items-center">
                     <!-- Assignee Filter -->
                     <div class="flex-1">
-                        <select name="assigned_to"
-                                onchange="this.form.submit()" 
+                        <select name="assigned_to" 
+                                onchange="this.form.submit()"
                                 class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
                             <option value="">Semua Assignee</option>
                             @foreach($users as $user)
@@ -190,11 +190,11 @@
                     <!-- Filter Actions -->
 <div class="flex gap-2 items-center">
     @if(request()->hasAny(['search', 'date', 'status', 'priority', 'assigned_to']))
-        <span class="text-sm text-gray-600 px-3 py-2">Filter aktif:</span>
+        <span class="text-sm text-gray-600 px-3 py-2">Filter aktif</span>
         @if(request('date'))
             <span class="px-3 py-2 bg-blue-100 text-blue-800 text-sm rounded-lg flex items-center gap-2">
                 {{ \Carbon\Carbon::parse(request('date'))->format('d/m/Y') }}
-                <a href="{{ route('user.tasks', array_diff_key(request()->all(), ['date' => ''])) }}"
+                <a href="{{ route('admin.all-tasks', array_diff_key(request()->all(), ['date' => ''])) }}"
                         class="hover:text-blue-900 font-bold">
                     ×
                 </a>
@@ -203,7 +203,7 @@
         @if(request('status'))
             <span class="px-3 py-2 bg-purple-100 text-purple-800 text-sm rounded-lg flex items-center gap-2">
                 {{ request('status') }}
-                <a href="{{ route('user.tasks', array_diff_key(request()->all(), ['status' => ''])) }}"
+                <a href="{{ route('admin.all-tasks', array_diff_key(request()->all(), ['status' => ''])) }}"
                         class="hover:text-purple-900 font-bold">
                     ×
                 </a>
@@ -212,7 +212,7 @@
         @if(request('priority'))
             <span class="px-3 py-2 bg-orange-100 text-orange-800 text-sm rounded-lg flex items-center gap-2">
                 Prioritas: {{ request('priority') }}
-                <a href="{{ route('user.tasks', array_diff_key(request()->all(), ['priority' => ''])) }}"
+                <a href="{{ route('admin.all-tasks', array_diff_key(request()->all(), ['priority' => ''])) }}"
                         class="hover:text-orange-900 font-bold">
                     ×
                 </a>
@@ -225,7 +225,7 @@
             @if($assignedUser)
                 <span class="px-3 py-2 bg-green-100 text-green-800 text-sm rounded-lg flex items-center gap-2">
                     {{ $assignedUser->name }}
-                    <a href="{{ route('user.tasks', array_diff_key(request()->all(), ['assigned_to' => ''])) }}"
+                    <a href="{{ route('admin.all-tasks', array_diff_key(request()->all(), ['assigned_to' => ''])) }}"
                             class="hover:text-green-900 font-bold">
                         ×
                     </a>
@@ -233,7 +233,7 @@
             @endif
         @endif
     @endif
-    <a href="{{ route('user.tasks') }}"
+    <a href="{{ route('admin.all-tasks') }}"
        class="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm whitespace-nowrap">
         Reset Semua Filter
     </a>
@@ -262,17 +262,17 @@
                             {{ $task->status == 'Selesai' ? 'border-green-400' : '' }}
                             {{ $task->status == 'Terlambat' ? 'border-red-400' : '' }}">
                     <div class="flex items-start justify-between">
-    <div class="flex-1">
-        <div class="flex items-center justify-between mb-1">
-            <h5 class="font-bold text-gray-800">{{ $task->title }}</h5>
-            <span class="text-xs text-gray-500 ml-4 flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y') }}
-            </span>
-        </div>
-        <p class="text-sm text-gray-600 mb-3">{{ $task->description }}</p>
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-1">
+                                <h5 class="font-bold text-gray-800">{{ $task->title }}</h5>
+                                <span class="text-xs text-gray-500 ml-4 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y') }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">{{ $task->description }}</p>
                             
                             <div class="flex items-center gap-3 flex-wrap">
                                 <span class="text-xs px-3 py-1 rounded-full font-medium
@@ -298,36 +298,20 @@
                         </div>
                         
                         <div class="flex items-center gap-2 ml-4">
-                            @if($task->status == 'Menunggu')
-                                <button onclick='openEditTaskOverlay(@json($task))' 
-                                        class="p-2 hover:bg-blue-50 rounded-lg transition"
-                                        title="Edit Task">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </button>
-                                <form action="{{ route('user.tasks.destroy', $task) }}" method="POST" 
-                                      onsubmit="return confirm('Yakin ingin menghapus task ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 hover:bg-red-50 rounded-lg transition" title="Hapus Task">
-                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                </form>
-                            @else
-                                <button class="p-2 opacity-50 cursor-not-allowed" disabled title="Tidak dapat edit task yang sudah diproses">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                </button>
-                                <button class="p-2 opacity-50 cursor-not-allowed" disabled title="Tidak dapat hapus task yang sudah diproses">
-                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                    </svg>
-                                </button>
-                            @endif
+                            <button onclick='openEditTaskOverlay(@json($task))' 
+                                    class="p-2 hover:bg-blue-50 rounded-lg transition"
+                                    title="Edit Task">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button onclick="deleteTask({{ $task->id }})" 
+                                    class="p-2 hover:bg-red-50 rounded-lg transition" 
+                                    title="Hapus Task">
+                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -365,7 +349,6 @@
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        minlength="3"
                        required>
-                <p class="text-xs text-gray-500 mt-1">Minimal 3 karakter</p>
             </div>
 
             <!-- Deskripsi -->
@@ -377,7 +360,6 @@
                           placeholder="Deskripsi detail task"
                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           required></textarea>
-                <p class="text-xs text-gray-500 mt-1">Jelaskan detail task yang harus dikerjakan</p>
             </div>
 
             <!-- Assign ke -->
@@ -419,11 +401,6 @@
                 </div>
             </div>
 
-            <!-- Info Required -->
-            <p class="text-xs text-gray-500 mb-4">
-                <span class="text-red-500">*</span> Semua field wajib diisi
-            </p>
-
             <!-- Buttons -->
             <div class="flex gap-3">
                 <button type="button" onclick="closeTaskOverlay()"
@@ -460,7 +437,6 @@
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        minlength="3"
                        required>
-                <p class="text-xs text-gray-500 mt-1">Minimal 3 karakter</p>
             </div>
 
             <!-- Deskripsi -->
@@ -486,6 +462,21 @@
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
+                </select>
+            </div>
+
+            <!-- Status -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Status <span class="text-red-500">*</span>
+                </label>
+                <select name="status" id="editTaskStatus"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        required>
+                    <option value="Menunggu">Menunggu</option>
+                    <option value="Dalam Proses">Dalam Proses</option>
+                    <option value="Selesai">Selesai</option>
+                    <option value="Terlambat">Terlambat</option>
                 </select>
             </div>
 
@@ -528,6 +519,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Open overlay
     function openTaskOverlay() {
@@ -546,64 +538,10 @@
     document.getElementById('taskForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const title = document.getElementById('taskTitle').value.trim();
-        const description = document.getElementById('taskDescription').value.trim();
-        const assignedTo = document.getElementById('taskAssignedTo').value;
-        const priority = document.getElementById('taskPriority').value;
-        const dueDate = document.getElementById('taskDueDate').value;
-        
-        if (!title || !description || !assignedTo || !priority || !dueDate) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Ada bagian yang belum diisi. Mohon lengkapi semua field yang wajib diisi.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        if (title.length < 3) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Judul task minimal 3 karakter.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        if (description.length < 10) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Deskripsi minimal 10 karakter.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        const selectedDate = new Date(dueDate);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        if (selectedDate < today) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Deadline tidak boleh kurang dari hari ini.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-        
         const formData = new FormData(this);
         
         try {
-            const response = await fetch('{{ route('user.dashboard.storeTask') }}', {
+            const response = await fetch('{{ route('admin.dashboard.storeTask') }}', {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -651,6 +589,7 @@
         document.getElementById('editTaskTitle').value = task.title;
         document.getElementById('editTaskDescription').value = task.description;
         document.getElementById('editTaskAssignedTo').value = task.assigned_to;
+        document.getElementById('editTaskStatus').value = task.status;
         document.getElementById('editTaskPriority').value = task.priority;
         document.getElementById('editTaskDueDate').value = task.due_date;
         
@@ -670,49 +609,10 @@
         e.preventDefault();
         
         const taskId = document.getElementById('editTaskId').value;
-        const title = document.getElementById('editTaskTitle').value.trim();
-        const description = document.getElementById('editTaskDescription').value.trim();
-        const assignedTo = document.getElementById('editTaskAssignedTo').value;
-        const priority = document.getElementById('editTaskPriority').value;
-        const dueDate = document.getElementById('editTaskDueDate').value;
-        
-        if (!title || !description || !assignedTo || !priority || !dueDate) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Ada bagian yang belum diisi.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        if (title.length < 3) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Judul task minimal 3 karakter.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        if (description.length < 10) {
-            Swal.fire({
-                title: 'Perhatian!',
-                text: 'Deskripsi minimal 10 karakter.',
-                icon: 'warning',
-                confirmButtonColor: '#f59e0b',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-        
         const formData = new FormData(this);
         
         try {
-            const response = await fetch(`/user/dashboard/task/${taskId}`, {
+            const response = await fetch(`/admin/dashboard/task/${taskId}`, {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -753,6 +653,62 @@
             });
         }
     });
+
+    // Delete task function
+    async function deleteTask(taskId) {
+        const result = await Swal.fire({
+            title: 'Hapus Task?',
+            text: 'Task yang dihapus tidak dapat dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/admin/all-tasks/${taskId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonColor: '#000000',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: 'Terjadi kesalahan saat menghapus task',
+                    icon: 'error',
+                    confirmButtonColor: '#ef4444',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    }
 
     // Close overlays when clicking outside
     document.getElementById('taskOverlay').addEventListener('click', function(e) {

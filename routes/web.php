@@ -22,9 +22,11 @@ Route::middleware('guest')->group(function () {
 // Admin routes
 Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/all-tasks', [AdminDashboardController::class, 'tasks'])->name('admin.all-tasks');
     Route::post('/dashboard/task', [AdminDashboardController::class, 'storeTask'])->name('admin.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [AdminDashboardController::class, 'updateTask'])->name('admin.dashboard.updateTask');
     Route::post('/dashboard/task/{task}/approve', [AdminDashboardController::class, 'approveTask'])->name('admin.dashboard.approveTask');
+    Route::delete('/all-tasks/{task}', [AdminDashboardController::class, 'destroyTask'])->name('admin.all-tasks.destroy');
     Route::resource('tasks', TaskController::class)->names([
         'index' => 'admin.tasks.index',
         'create' => 'admin.tasks.create',

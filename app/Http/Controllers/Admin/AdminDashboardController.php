@@ -198,4 +198,75 @@ class AdminDashboardController extends Controller
             ], 500);
         }
     }
+
+    public function tasks(Request $request)
+{
+    // Get all users for filter
+    $users = User::all();
+
+    // Base query
+    $query = Task::with(['user', 'assignedUser']);
+
+    // Apply filters
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('title', 'like', '%' . $request->search . '%')
+              ->orWhere('description', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    if ($request->filled('date')) {
+        $query->whereDate('due_date', $request->date);
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('priority')) {
+        $query->where('priority', $request->priority);
+    }
+
+    if ($request->filled('assigned_to')) {
+        $query->where('assigned_to', $request->assigned_to);
+    }
+
+    $tasks = $query->orderBy('created_at', 'desc')->get();
+
+    // Count tasks by status
+    $allTasks = Task::all();
+    $totalTasks = $allTasks->count();
+    $selesai = $allTasks->where('status', 'Selesai')->count();
+    $dalamProses = $allTasks->where('status', 'Dalam Proses')->count();
+    $menunggu = $allTasks->where('status', 'Menunggu')->count();
+    $terlambat = $allTasks->where('status', 'Terlambat')->count();
+
+    return view('admin.tasks', compact(
+        'tasks',
+        'users',
+        'totalTasks',
+        'selesai',
+        'dalamProses',
+        'menunggu',
+        'terlambat'
+    ));
+}
+
+public function destroyTask(Task $task)
+{
+    try {
+        $task->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task berhasil dihapus!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menghapus task: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
