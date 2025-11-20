@@ -34,7 +34,7 @@
                         </svg>
                         Semua Task
                     </a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                    <a href="{{ route('user.announcements') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
                     </svg>
@@ -217,7 +217,7 @@
                                 </div>
                                 <div class="flex gap-2">
                                     @if ($task->status != 'Dalam Proses' && $task->status != 'Selesai')
-                                        <button onclick='openEditTaskOverlay(@json($task))' class="p-2 hover:bg-white rounded-lg">
+                                        <button onclick="openEditTaskOverlay(@json($task))" class="p-2 hover:bg-white rounded-lg">
                                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
@@ -577,7 +577,7 @@
                 const formData = new FormData(this);
 
                 try {
-                    const response = await fetch('{{ route('user.dashboard.storeTask') }}', {
+                    const response = await fetch("{{ route('user.dashboard.storeTask') }}", {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',

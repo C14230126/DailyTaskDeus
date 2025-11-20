@@ -269,4 +269,116 @@ public function destroyTask(Task $task)
         ], 500);
     }
 }
+
+public function announcements()
+{
+    $announcements = \App\Models\Announcement::with('creator')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('admin.announcements', compact('announcements'));
+}
+
+public function storeAnnouncement(Request $request)
+{
+    try {
+        $validated = $request->validate([
+            'title' => 'required|string|min:5|max:255',
+            'content' => 'required|string|min:10',
+            'type' => 'required|in:Penting,Event,Umum,Cuti',
+            'priority' => 'required|in:Sedang,Tinggi,Rendah',
+            'target_audience' => 'nullable|string',
+            'end_date' => 'nullable|date|after_or_equal:today',
+        ], [
+            'title.required' => 'Judul pengumuman wajib diisi',
+            'title.min' => 'Judul minimal 5 karakter',
+            'content.required' => 'Konten pengumuman wajib diisi',
+            'content.min' => 'Konten minimal 10 karakter',
+            'type.required' => 'Tipe pengumuman wajib dipilih',
+            'priority.required' => 'Prioritas wajib dipilih',
+        ]);
+
+        \App\Models\Announcement::create([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'type' => $validated['type'],
+            'priority' => $validated['priority'],
+            'target_audience' => $validated['target_audience'] ?? 'Semua',
+            'end_date' => $validated['end_date'] ?? null,
+            'created_by' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengumuman berhasil ditambahkan!'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menambahkan pengumuman: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function updateAnnouncement(Request $request, $id)
+{
+    try {
+        $announcement = \App\Models\Announcement::findOrFail($id);
+        
+$request->validate([
+    'title' => 'required|string|min:5|max:255',
+    'content' => 'required|string|min:10',
+    'type' => 'required|in:Penting,Event,Umum,Cuti',
+    'priority' => 'nullable|in:Sedang,Tinggi,Rendah',
+    'target_audience' => 'nullable|string',
+    'end_date' => 'nullable|date|after_or_equal:today',
+]);
+
+                    $announcement->update([
+                        'title' => $request->title,
+                        'content' => $request->input('content'),
+                        'type' => $request->type,
+                        'priority' => $request->priority ?? 'Sedang',
+                        'target_audience' => $request->target_audience ?? 'Semua',
+                        'end_date' => $request->end_date,
+                ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengumuman berhasil diupdate!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate pengumuman: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function destroyAnnouncement($id)
+{
+    try {
+        $announcement = \App\Models\Announcement::findOrFail($id);
+        $announcement->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengumuman berhasil dihapus!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menghapus pengumuman: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 }

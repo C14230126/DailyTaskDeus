@@ -29,7 +29,7 @@
                     </svg>
                     Semua Task
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                <a href="{{ route('user.announcements') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
                     </svg>
@@ -299,7 +299,7 @@
                         
                         <div class="flex items-center gap-2 ml-4">
                             @if($task->status == 'Menunggu')
-                                <button onclick='openEditTaskOverlay(@json($task))' 
+php artisan make:migration update_type_column_in_announcements_table                                <button onclick="openEditTaskOverlay(@json($task))" 
                                         class="p-2 hover:bg-blue-50 rounded-lg transition"
                                         title="Edit Task">
                                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -602,8 +602,8 @@
         
         const formData = new FormData(this);
         
-        try {
-            const response = await fetch('{{ route('user.dashboard.storeTask') }}', {
+            try {
+            const response = await fetch("{{ route('user.dashboard.storeTask') }}", {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',

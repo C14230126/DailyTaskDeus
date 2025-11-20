@@ -275,4 +275,12 @@ class UserDashboardController extends Controller
             ], 500);
         }
     }
+    public function announcements()
+{
+    $announcements = \App\Models\Announcement::with('creator')
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('user.announcements', compact('announcements'));
+}
 }

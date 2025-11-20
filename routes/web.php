@@ -23,6 +23,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/all-tasks', [AdminDashboardController::class, 'tasks'])->name('admin.all-tasks');
+    Route::get('/announcements', [AdminDashboardController::class, 'announcements'])->name('admin.announcements');
+    Route::post('/announcements', [AdminDashboardController::class, 'storeAnnouncement'])->name('admin.announcements.store');
+    Route::put('/announcements/{id}', [AdminDashboardController::class, 'updateAnnouncement'])->name('admin.announcements.update');
+    Route::delete('/announcements/{id}', [AdminDashboardController::class, 'destroyAnnouncement'])->name('admin.announcements.destroy');
     Route::post('/dashboard/task', [AdminDashboardController::class, 'storeTask'])->name('admin.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [AdminDashboardController::class, 'updateTask'])->name('admin.dashboard.updateTask');
     Route::post('/dashboard/task/{task}/approve', [AdminDashboardController::class, 'approveTask'])->name('admin.dashboard.approveTask');
@@ -41,6 +45,7 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
 Route::middleware('user')->prefix('user')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::get('/tasks', [UserDashboardController::class, 'tasks'])->name('user.tasks');
+    Route::get('/announcements', [UserDashboardController::class, 'announcements'])->name('user.announcements');
     Route::post('/dashboard/task', [UserDashboardController::class, 'storeTask'])->name('user.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [UserDashboardController::class, 'updateTask'])->name('user.dashboard.updateTask');
     Route::delete('/tasks/{task}', [UserDashboardController::class, 'destroyTask'])->name('user.tasks.destroy');
