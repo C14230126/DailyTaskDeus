@@ -380,5 +380,202 @@ public function destroyAnnouncement($id)
         ], 500);
     }
 }
+public function leaves()
+{
+    $leaves = \App\Models\Leave::with(['user', 'approver'])
+        ->orderBy('created_at', 'desc')
+        ->get();
 
+    // Count leaves by status
+    $totalLeaves = $leaves->count();
+    $menunggu = $leaves->where('status', 'Menunggu')->count();
+    $disetujui = $leaves->where('status', 'Disetujui')->count();
+    $ditolak = $leaves->where('status', 'Ditolak')->count();
+
+    return view('admin.leaves', compact(
+        'leaves',
+        'totalLeaves',
+        'menunggu',
+        'disetujui',
+        'ditolak'
+    ));
+}
+
+public function approveLeave(Request $request, $id)
+{
+    try {
+        $leave = \App\Models\Leave::findOrFail($id);
+        
+        if ($leave->status !== 'Menunggu') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengajuan cuti sudah diproses'
+            ], 400);
+        }
+
+        $leave->update([
+            'status' => 'Disetujui',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+            'rejection_reason' => null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil disetujui!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menyetujui cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function rejectLeave(Request $request, $id)
+{
+    try {
+        $leave = \App\Models\Leave::findOrFail($id);
+        
+        if ($leave->status !== 'Menunggu') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengajuan cuti sudah diproses'
+            ], 400);
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|min:10',
+        ], [
+            'rejection_reason.required' => 'Alasan penolakan wajib diisi',
+            'rejection_reason.min' => 'Alasan penolakan minimal 10 karakter',
+        ]);
+
+        $leave->update([
+            'status' => 'Ditolak',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+            'rejection_reason' => $request->rejection_reason,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil ditolak!'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menolak cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function storeLeave(Request $request)
+{
+    try {
+        $request->validate([
+            'type' => 'required|in:Sakit,Izin,Cuti Tahunan,Lainnya',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $startDate = \Carbon\Carbon::parse($request->start_date);
+        $endDate = \Carbon\Carbon::parse($request->end_date);
+        $duration = $startDate->diffInDays($endDate) + 1;
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('leave_attachments', 'public');
+        }
+
+        // Admin tetap mengajukan dengan status "Menunggu" seperti user biasa
+        // Tapi bisa langsung approve sendiri jika mau
+        \App\Models\Leave::create([
+            'user_id' => Auth::id(),
+            'type' => $request->type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'duration' => $duration,
+            'reason' => $request->reason,
+            'status' => 'Menunggu', // Ubah ke Menunggu
+            'attachment' => $attachmentPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil diajukan!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengajukan cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+public function updateLeave(Request $request, $id)
+{
+    try {
+        $leave = \App\Models\Leave::findOrFail($id);
+        
+        // Hanya bisa edit cuti yang masih menunggu
+        if ($leave->status !== 'Menunggu') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya cuti dengan status Menunggu yang bisa diedit'
+            ], 400);
+        }
+
+        $request->validate([
+            'type' => 'required|in:Sakit,Izin,Cuti Tahunan,Lainnya',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $startDate = \Carbon\Carbon::parse($request->start_date);
+        $endDate = \Carbon\Carbon::parse($request->end_date);
+        $duration = $startDate->diffInDays($endDate) + 1;
+
+        // Handle file upload
+        $attachmentPath = $leave->attachment;
+        if ($request->hasFile('attachment')) {
+            // Delete old file if exists
+            if ($attachmentPath && \Storage::disk('public')->exists($attachmentPath)) {
+                \Storage::disk('public')->delete($attachmentPath);
+            }
+            $attachmentPath = $request->file('attachment')->store('leave_attachments', 'public');
+        }
+
+        $leave->update([
+            'type' => $request->type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'duration' => $duration,
+            'reason' => $request->reason,
+            'attachment' => $attachmentPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil diupdate!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

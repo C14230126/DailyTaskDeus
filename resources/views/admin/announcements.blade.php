@@ -35,7 +35,7 @@
                     </svg>
                     Pengumuman
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
+                <a href="{{ route('admin.leaves') }}" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-lg">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
@@ -153,21 +153,21 @@
 
                         <!-- Action Buttons -->
                         <div class="flex items-center gap-2 ml-4">
-                                <button onclick="openEditAnnouncementOverlay(@json($announcement))" 
-                                    class="p-2 hover:bg-blue-50 rounded-lg transition"
-                                    title="Edit Pengumuman">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                </svg>
-                            </button>
-                            <button onclick="deleteAnnouncement({{ $announcement->id }})" 
-                                    class="p-2 hover:bg-red-50 rounded-lg transition" 
-                                    title="Hapus Pengumuman">
-                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                        </div>
+    <button onclick='openEditAnnouncementOverlay(@json($announcement))' 
+            class="p-2 hover:bg-blue-50 rounded-lg transition"
+            title="Edit Pengumuman">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+        </svg>
+    </button>
+    <button onclick="deleteAnnouncement({{ $announcement->id }})" 
+            class="p-2 hover:bg-red-50 rounded-lg transition" 
+            title="Hapus Pengumuman">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+    </button>
+</div>
                     </div>
                 </div>
                 @empty
@@ -288,6 +288,7 @@
 </div>
 
 <!-- Overlay Popup Edit Pengumuman -->
+<!-- Overlay Popup Edit Pengumuman -->
 <div id="editAnnouncementOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform transition-all">
         <h3 class="text-xl font-bold text-gray-800 mb-1">Edit Pengumuman</h3>
@@ -325,10 +326,11 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Prioritas
+                        Prioritas <span class="text-red-500">*</span>
                     </label>
                     <select name="priority" id="editAnnouncementPriority"
-                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm appearance-none">
+                            class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm appearance-none"
+                            required>
                         <option value="Sedang">Sedang</option>
                         <option value="Tinggi">Tinggi</option>
                         <option value="Rendah">Rendah</option>
@@ -336,7 +338,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Tipe
+                        Tipe <span class="text-red-500">*</span>
                     </label>
                     <select name="type" id="editAnnouncementType"
                             class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm appearance-none"
@@ -381,7 +383,7 @@
                 </button>
                 <button type="submit"
                         class="flex-1 px-4 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm">
-                    Publikasikan
+                    Update
                 </button>
             </div>
         </form>
@@ -502,74 +504,126 @@ document.getElementById('announcementForm').addEventListener('submit', async fun
     }
 });
 
-    // Open edit overlay
-    function openEditAnnouncementOverlay(announcement) {
-        document.getElementById('editAnnouncementId').value = announcement.id;
-        document.getElementById('editAnnouncementTitle').value = announcement.title;
-        document.getElementById('editAnnouncementContent').value = announcement.content;
-        document.getElementById('editAnnouncementType').value = announcement.type;
-        
-        document.getElementById('editAnnouncementOverlay').classList.remove('hidden');
-        document.getElementById('editAnnouncementOverlay').classList.add('flex');
-    }
+   // Open edit overlay
+function openEditAnnouncementOverlay(announcement) {
+    document.getElementById('editAnnouncementId').value = announcement.id;
+    document.getElementById('editAnnouncementTitle').value = announcement.title;
+    document.getElementById('editAnnouncementContent').value = announcement.content;
+    document.getElementById('editAnnouncementType').value = announcement.type;
+    document.getElementById('editAnnouncementPriority').value = announcement.priority || 'Sedang';
+    document.getElementById('editAnnouncementTarget').value = announcement.target_audience || 'Semua';
+    document.getElementById('editAnnouncementEndDate').value = announcement.end_date || '';
+    
+    document.getElementById('editAnnouncementOverlay').classList.remove('hidden');
+    document.getElementById('editAnnouncementOverlay').classList.add('flex');
+}
 
-    // Close edit overlay
-    function closeEditAnnouncementOverlay() {
-        document.getElementById('editAnnouncementOverlay').classList.add('hidden');
-        document.getElementById('editAnnouncementOverlay').classList.remove('flex');
-        document.getElementById('editAnnouncementForm').reset();
-    }
+// Close edit overlay
+function closeEditAnnouncementOverlay() {
+    document.getElementById('editAnnouncementOverlay').classList.add('hidden');
+    document.getElementById('editAnnouncementOverlay').classList.remove('flex');
+    document.getElementById('editAnnouncementForm').reset();
+}
 
-    // Handle edit form submission
-    document.getElementById('editAnnouncementForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const announcementId = document.getElementById('editAnnouncementId').value;
-        const formData = new FormData(this);
-        
-        try {
-            const response = await fetch(`/admin/announcements/${announcementId}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                },
-                body: formData
+// Handle edit form submission
+document.getElementById('editAnnouncementForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const announcementId = document.getElementById('editAnnouncementId').value;
+    const title = document.getElementById('editAnnouncementTitle').value.trim();
+    const content = document.getElementById('editAnnouncementContent').value.trim();
+    const type = document.getElementById('editAnnouncementType').value;
+    const priority = document.getElementById('editAnnouncementPriority').value;
+    
+    // Validasi client-side
+    if (!title || title.length < 5) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Judul pengumuman minimal 5 karakter',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (!content || content.length < 10) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Isi pengumuman minimal 10 karakter',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (!type) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Tipe pengumuman wajib dipilih',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (!priority) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Prioritas wajib dipilih',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch(`/admin/announcements/${announcementId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeEditAnnouncementOverlay();
+            Swal.fire({
+                title: 'Berhasil!',
+                text: data.message,
+                icon: 'success',
+                confirmButtonColor: '#000000',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.reload();
             });
-
-            const data = await response.json();
-
-            if (data.success) {
-                closeEditAnnouncementOverlay();
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: data.message,
-                    icon: 'success',
-                    confirmButtonColor: '#000000',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    window.location.reload();
-                });
-            } else {
-                Swal.fire({
-                    title: 'Gagal!',
-                    text: data.message,
-                    icon: 'error',
-                    confirmButtonColor: '#ef4444',
-                    confirmButtonText: 'OK'
-                });
-            }
-        } catch (error) {
+        } else {
             Swal.fire({
                 title: 'Gagal!',
-                text: 'Terjadi kesalahan saat mengupdate pengumuman',
+                text: data.message,
                 icon: 'error',
                 confirmButtonColor: '#ef4444',
                 confirmButtonText: 'OK'
             });
         }
-    });
-
+    } catch (error) {
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan saat mengupdate pengumuman',
+            icon: 'error',
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'OK'
+        });
+    }
+});
     // Delete announcement function
     async function deleteAnnouncement(announcementId) {
         const result = await Swal.fire({
@@ -638,6 +692,20 @@ document.getElementById('announcementForm').addEventListener('submit', async fun
             closeEditAnnouncementOverlay();
         }
     });
+
+
+    // Close overlays when clicking outside
+document.getElementById('announcementOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAnnouncementOverlay();
+    }
+});
+
+document.getElementById('editAnnouncementOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditAnnouncementOverlay();
+    }
+});
 </script>
 
 @endsection

@@ -27,6 +27,11 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::post('/announcements', [AdminDashboardController::class, 'storeAnnouncement'])->name('admin.announcements.store');
     Route::put('/announcements/{id}', [AdminDashboardController::class, 'updateAnnouncement'])->name('admin.announcements.update');
     Route::delete('/announcements/{id}', [AdminDashboardController::class, 'destroyAnnouncement'])->name('admin.announcements.destroy');
+    Route::get('/leaves', [AdminDashboardController::class, 'leaves'])->name('admin.leaves');
+    Route::put('/leaves/{id}', [AdminDashboardController::class, 'updateLeave'])->name('admin.leaves.update');
+    Route::post('/leaves/{id}/approve', [AdminDashboardController::class, 'approveLeave'])->name('admin.leaves.approve');
+    Route::post('/leaves/{id}/reject', [AdminDashboardController::class, 'rejectLeave'])->name('admin.leaves.reject');
+    Route::post('/leaves/store', [AdminDashboardController::class, 'storeLeave'])->name('admin.leaves.store');
     Route::post('/dashboard/task', [AdminDashboardController::class, 'storeTask'])->name('admin.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [AdminDashboardController::class, 'updateTask'])->name('admin.dashboard.updateTask');
     Route::post('/dashboard/task/{task}/approve', [AdminDashboardController::class, 'approveTask'])->name('admin.dashboard.approveTask');
