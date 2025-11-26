@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('title', 'Pengajuan Cuti - Admin')
@@ -166,9 +167,36 @@
                                 <div class="text-sm text-gray-700">
                                     <span class="font-medium">Alasan:</span> {{ $leave->reason }}
                                 </div>
+                                @if($leave->attachment)
+                                <div class="text-sm text-gray-700">
+                                    <div class="flex items-start gap-2 mb-2">
+                                        <svg class="w-4 h-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                        </svg>
+                                        <div class="flex-1">
+                                            <span class="font-medium">Lampiran:</span>
+                                            <a href="{{ asset('storage/' . $leave->attachment) }}" target="_blank" 
+                                               class="text-blue-600 hover:text-blue-800 underline ml-2">
+                                                {{ basename($leave->attachment) }}
+                                            </a>
+                                            @php
+                                                $extension = pathinfo($leave->attachment, PATHINFO_EXTENSION);
+                                                $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png']);
+                                            @endphp
+                                            @if($isImage)
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $leave->attachment) }}" 
+                                                     alt="Lampiran" 
+                                                     class="max-w-xs rounded border border-gray-300 cursor-pointer hover:opacity-90"
+                                                     onclick="window.open(this.src, '_blank')">
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
                         </div>
-
 <!-- Action Buttons -->
 <div class="flex items-center gap-2 ml-4">
     <button onclick='openEditLeaveOverlay(@json($leave))' 
@@ -208,7 +236,7 @@
                 @endforelse
             </div>
 
-            <!-- Riwayat Pengajuan Cuti -->
+        <!-- Riwayat Pengajuan Cuti -->
             <div class="mb-6 pt-6 border-t">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Riwayat Pengajuan Cuti</h3>
                 <p class="text-sm text-gray-600">Semua pengajuan cuti dan status persetujuan</p>
@@ -255,6 +283,34 @@
                                 <div class="text-sm text-gray-700">
                                     <span class="font-medium">Alasan:</span> {{ $leave->reason }}
                                 </div>
+                                @if($leave->attachment)
+                                <div class="text-sm text-gray-700">
+                                    <div class="flex items-start gap-2 mb-2">
+                                        <svg class="w-4 h-4 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
+                                        </svg>
+                                        <div class="flex-1">
+                                            <span class="font-medium">Lampiran:</span>
+                                            <a href="{{ asset('storage/' . $leave->attachment) }}" target="_blank" 
+                                               class="text-blue-600 hover:text-blue-800 underline ml-2">
+                                                {{ basename($leave->attachment) }}
+                                            </a>
+                                            @php
+                                                $extension = pathinfo($leave->attachment, PATHINFO_EXTENSION);
+                                                $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png']);
+                                            @endphp
+                                            @if($isImage)
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $leave->attachment) }}" 
+                                                     alt="Lampiran" 
+                                                     class="max-w-xs rounded border border-gray-300 cursor-pointer hover:opacity-90"
+                                                     onclick="window.open(this.src, '_blank')">
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                                 @if($leave->status == 'Ditolak' && $leave->rejection_reason)
                                 <div class="text-sm text-red-700 bg-red-50 p-3 rounded">
                                     <span class="font-medium">Alasan Penolakan:</span> {{ $leave->rejection_reason }}
@@ -916,5 +972,7 @@ document.getElementById('editLeaveOverlay').addEventListener('click', function(e
     }
 });
 </script>
+
+
 
 @endsection

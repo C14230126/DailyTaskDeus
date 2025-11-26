@@ -51,6 +51,10 @@ Route::middleware('user')->prefix('user')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('user.dashboard');
     Route::get('/tasks', [UserDashboardController::class, 'tasks'])->name('user.tasks');
     Route::get('/announcements', [UserDashboardController::class, 'announcements'])->name('user.announcements');
+    Route::get('/leaves', [UserDashboardController::class, 'leaves'])->name('user.leaves');
+    Route::post('/leaves', [UserDashboardController::class, 'storeLeave'])->name('user.leaves.store');
+    Route::put('/leaves/{id}', [UserDashboardController::class, 'updateLeave'])->name('user.leaves.update');
+    Route::delete('/leaves/{id}', [UserDashboardController::class, 'destroyLeave'])->name('user.leaves.destroy');
     Route::post('/dashboard/task', [UserDashboardController::class, 'storeTask'])->name('user.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [UserDashboardController::class, 'updateTask'])->name('user.dashboard.updateTask');
     Route::delete('/tasks/{task}', [UserDashboardController::class, 'destroyTask'])->name('user.tasks.destroy');

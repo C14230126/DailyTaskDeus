@@ -283,4 +283,180 @@ class UserDashboardController extends Controller
 
     return view('user.announcements', compact('announcements'));
 }
+
+public function leaves()
+{
+    $leaves = \App\Models\Leave::where('user_id', auth()->id())
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    // Count leaves by status
+    $totalLeaves = $leaves->count();
+    $menunggu = $leaves->where('status', 'Menunggu')->count();
+    $disetujui = $leaves->where('status', 'Disetujui')->count();
+    $ditolak = $leaves->where('status', 'Ditolak')->count();
+
+    return view('user.leaves', compact(
+        'leaves',
+        'totalLeaves',
+        'menunggu',
+        'disetujui',
+        'ditolak'
+    ));
+}
+
+public function storeLeave(Request $request)
+{
+    try {
+        $request->validate([
+            'type' => 'required|in:Sakit,Izin,Cuti Tahunan,Lainnya',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ], [
+            'type.required' => 'Jenis cuti wajib dipilih',
+            'start_date.required' => 'Tanggal mulai wajib diisi',
+            'start_date.after_or_equal' => 'Tanggal mulai tidak boleh kurang dari hari ini',
+            'end_date.required' => 'Tanggal selesai wajib diisi',
+            'end_date.after_or_equal' => 'Tanggal selesai tidak boleh kurang dari tanggal mulai',
+            'reason.required' => 'Alasan cuti wajib diisi',
+            'reason.min' => 'Alasan minimal 10 karakter',
+            'attachment.mimes' => 'File harus berformat PDF, JPG, JPEG, atau PNG',
+            'attachment.max' => 'Ukuran file maksimal 2MB',
+        ]);
+
+        // Calculate duration
+        $startDate = \Carbon\Carbon::parse($request->start_date);
+        $endDate = \Carbon\Carbon::parse($request->end_date);
+        $duration = $startDate->diffInDays($endDate) + 1;
+
+        // Handle file upload
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('leave_attachments', 'public');
+        }
+
+        \App\Models\Leave::create([
+            'user_id' => auth()->id(),
+            'type' => $request->type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'duration' => $duration,
+            'reason' => $request->reason,
+            'status' => 'Menunggu',
+            'attachment' => $attachmentPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil diajukan!'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengajukan cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function updateLeave(Request $request, $id)
+{
+    try {
+        $leave = \App\Models\Leave::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+        
+        // Hanya bisa edit cuti yang masih menunggu
+        if ($leave->status !== 'Menunggu') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya cuti dengan status Menunggu yang bisa diedit'
+            ], 400);
+        }
+
+        $request->validate([
+            'type' => 'required|in:Sakit,Izin,Cuti Tahunan,Lainnya',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'required|string|min:10',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        $startDate = \Carbon\Carbon::parse($request->start_date);
+        $endDate = \Carbon\Carbon::parse($request->end_date);
+        $duration = $startDate->diffInDays($endDate) + 1;
+
+        // Handle file upload
+        $attachmentPath = $leave->attachment;
+        if ($request->hasFile('attachment')) {
+            // Delete old file if exists
+            if ($attachmentPath && \Storage::disk('public')->exists($attachmentPath)) {
+                \Storage::disk('public')->delete($attachmentPath);
+            }
+            $attachmentPath = $request->file('attachment')->store('leave_attachments', 'public');
+        }
+
+        $leave->update([
+            'type' => $request->type,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'duration' => $duration,
+            'reason' => $request->reason,
+            'attachment' => $attachmentPath,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil diupdate!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function destroyLeave($id)
+{
+    try {
+        $leave = \App\Models\Leave::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+        
+        // Hanya bisa hapus cuti yang masih menunggu
+        if ($leave->status !== 'Menunggu') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya cuti dengan status Menunggu yang bisa dihapus'
+            ], 400);
+        }
+
+        // Delete attachment if exists
+        if ($leave->attachment && \Storage::disk('public')->exists($leave->attachment)) {
+            \Storage::disk('public')->delete($leave->attachment);
+        }
+
+        $leave->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengajuan cuti berhasil dihapus!'
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menghapus cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
