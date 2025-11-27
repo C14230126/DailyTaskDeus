@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminDashboardController extends Controller
 {
@@ -575,6 +576,173 @@ public function updateLeave(Request $request, $id)
         return response()->json([
             'success' => false,
             'message' => 'Gagal mengupdate cuti: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
+// Tambahkan methods ini di dalam class AdminDashboardController
+
+public function team()
+{
+    $users = User::orderBy('created_at', 'desc')->get();
+    
+    // Count users by role
+    $totalUsers = $users->count();
+    $adminCount = $users->where('role', 'admin')->count();
+    $userCount = $users->where('role', 'user')->count();
+    
+    return view('admin.team', compact('users', 'totalUsers', 'adminCount', 'userCount'));
+}
+
+public function updateUserRole(Request $request, $id)
+{
+    try {
+        $user = User::findOrFail($id);
+        
+        // Tidak boleh mengubah role diri sendiri
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat mengubah role Anda sendiri'
+            ], 403);
+        }
+        
+        $request->validate([
+            'role' => 'required|in:admin,user',
+        ]);
+        
+        $user->update([
+            'role' => $request->role,
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Role berhasil diupdate!'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate role: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function destroyUser($id)
+{
+    try {
+        $user = User::findOrFail($id);
+        
+        // Tidak boleh menghapus diri sendiri
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat menghapus akun Anda sendiri'
+            ], 403);
+        }
+        
+        // Hapus user beserta semua data terkait
+        $user->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'User berhasil dihapus!'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal menghapus user: ' . $e->getMessage()
+        ], 500);
+    }
+}
+public function settings()
+{
+    $user = Auth::user();
+    return view('admin.settings', compact('user'));
+}
+
+public function updateProfile(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah digunakan',
+        ]);
+        
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diupdate!'
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate profil: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function resetPassword(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi',
+            'new_password.required' => 'Password baru wajib diisi',
+            'new_password.min' => 'Password baru minimal 8 karakter',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
+        
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password saat ini tidak sesuai'
+            ], 422);
+        }
+        
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil diubah!'
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengubah password: ' . $e->getMessage()
         ], 500);
     }
 }

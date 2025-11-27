@@ -459,4 +459,93 @@ public function destroyLeave($id)
         ], 500);
     }
 }
+public function settings()
+{
+    $user = Auth::user();
+    return view('user.settings', compact('user'));
+}
+
+public function updateProfile(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ], [
+            'name.required' => 'Nama lengkap wajib diisi',
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.unique' => 'Email sudah digunakan',
+        ]);
+        
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Profil berhasil diupdate!'
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengupdate profil: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function resetPassword(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi',
+            'new_password.required' => 'Password baru wajib diisi',
+            'new_password.min' => 'Password baru minimal 8 karakter',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
+        
+        // Check current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Password saat ini tidak sesuai'
+            ], 422);
+        }
+        
+        // Update password
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil diubah!'
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengubah password: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

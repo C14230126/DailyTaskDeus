@@ -36,6 +36,12 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::put('/dashboard/task/{task}', [AdminDashboardController::class, 'updateTask'])->name('admin.dashboard.updateTask');
     Route::post('/dashboard/task/{task}/approve', [AdminDashboardController::class, 'approveTask'])->name('admin.dashboard.approveTask');
     Route::delete('/all-tasks/{task}', [AdminDashboardController::class, 'destroyTask'])->name('admin.all-tasks.destroy');
+    Route::get('/team', [AdminDashboardController::class, 'team'])->name('admin.team');
+    Route::put('/team/{id}/role', [AdminDashboardController::class, 'updateUserRole'])->name('admin.team.updateRole');
+    Route::delete('/team/{id}', [AdminDashboardController::class, 'destroyUser'])->name('admin.team.destroy');
+    Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('admin.settings');
+    Route::put('/settings/profile', [AdminDashboardController::class, 'updateProfile'])->name('admin.settings.updateProfile');
+    Route::post('/settings/reset-password', [AdminDashboardController::class, 'resetPassword'])->name('admin.settings.resetPassword');
     Route::resource('tasks', TaskController::class)->names([
         'index' => 'admin.tasks.index',
         'create' => 'admin.tasks.create',
@@ -58,6 +64,9 @@ Route::middleware('user')->prefix('user')->group(function () {
     Route::post('/dashboard/task', [UserDashboardController::class, 'storeTask'])->name('user.dashboard.storeTask');
     Route::put('/dashboard/task/{task}', [UserDashboardController::class, 'updateTask'])->name('user.dashboard.updateTask');
     Route::delete('/tasks/{task}', [UserDashboardController::class, 'destroyTask'])->name('user.tasks.destroy');
+    Route::get('/settings', [UserDashboardController::class, 'settings'])->name('user.settings');
+    Route::put('/settings/profile', [UserDashboardController::class, 'updateProfile'])->name('user.settings.updateProfile');
+    Route::post('/settings/reset-password', [UserDashboardController::class, 'resetPassword'])->name('user.settings.resetPassword');
 });
 
 // Logout route (accessible by both admin and user)
