@@ -294,7 +294,7 @@
                         
                         <div class="flex items-center gap-2 ml-4">
                             @if($task->status == 'Menunggu')
-                               <button onclick="openEditTaskOverlay(@json($task))" 
+                               <button onclick='openEditTaskOverlay(@json($task))' 
                                         class="p-2 hover:bg-blue-50 rounded-lg transition"
                                         title="Edit Task">
                                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
