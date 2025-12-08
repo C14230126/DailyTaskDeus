@@ -259,7 +259,6 @@
                         <option value="Semua">Semua</option>
                         <option value="Manager">Manager</option>
                         <option value="Staff">Staff</option>
-                        <option value="Developer">Developer</option>
                     </select>
                 </div>
                 <div>
@@ -705,7 +704,9 @@ document.getElementById('editAnnouncementOverlay').addEventListener('click', fun
     if (e.target === this) {
         closeEditAnnouncementOverlay();
     }
+    
 });
+
 </script>
 
 @endsection

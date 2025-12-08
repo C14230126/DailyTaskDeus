@@ -274,6 +274,14 @@ public function destroyTask(Task $task)
 public function announcements()
 {
     $announcements = \App\Models\Announcement::with('creator')
+        ->orderByRaw("
+            CASE 
+                WHEN priority = 'Tinggi' THEN 1 
+                WHEN priority = 'Sedang' THEN 2 
+                WHEN priority = 'Rendah' THEN 3 
+                ELSE 999 
+            END
+        ")
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -743,6 +751,48 @@ public function resetPassword(Request $request)
         return response()->json([
             'success' => false,
             'message' => 'Gagal mengubah password: ' . $e->getMessage()
+        ], 500);
+    }
+}
+public function resetUserPassword(Request $request, $id)
+{
+    try {
+        $user = User::findOrFail($id);
+        
+        // Tidak boleh reset password diri sendiri
+        if ($user->id === Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat mereset password Anda sendiri'
+            ], 403);
+        }
+        
+        $request->validate([
+            'new_password' => 'required|min:8|confirmed',
+        ], [
+            'new_password.required' => 'Password baru wajib diisi',
+            'new_password.min' => 'Password baru minimal 8 karakter',
+            'new_password.confirmed' => 'Konfirmasi password tidak cocok',
+        ]);
+        
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Password user berhasil direset!'
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->validator->errors()->first()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mereset password: ' . $e->getMessage()
         ], 500);
     }
 }

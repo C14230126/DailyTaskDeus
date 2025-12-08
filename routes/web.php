@@ -39,6 +39,7 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::get('/team', [AdminDashboardController::class, 'team'])->name('admin.team');
     Route::put('/team/{id}/role', [AdminDashboardController::class, 'updateUserRole'])->name('admin.team.updateRole');
     Route::delete('/team/{id}', [AdminDashboardController::class, 'destroyUser'])->name('admin.team.destroy');
+    Route::post('/team/{id}/reset-password', [AdminDashboardController::class, 'resetUserPassword'])->name('admin.team.reset-password');
     Route::get('/settings', [AdminDashboardController::class, 'settings'])->name('admin.settings');
     Route::put('/settings/profile', [AdminDashboardController::class, 'updateProfile'])->name('admin.settings.updateProfile');
     Route::post('/settings/reset-password', [AdminDashboardController::class, 'resetPassword'])->name('admin.settings.resetPassword');

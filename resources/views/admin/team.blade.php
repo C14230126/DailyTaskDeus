@@ -143,30 +143,42 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            @if($user->id !== auth()->id())
-                            <button onclick='openEditRoleOverlay(@json($user))'
-                                class="p-2 hover:bg-gray-100 rounded-lg transition" title="Edit Role">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                            </button>
-                            <button onclick="deleteUser({{ $user->id }}, '{{ $user->name }}')"
-                                class="p-2 hover:bg-red-50 rounded-lg transition" title="Hapus User">
-                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                            @else
-                            <button class="p-2 opacity-50 cursor-not-allowed" disabled title="Tidak dapat edit akun sendiri">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                            </button>
-                            @endif
-                        </div>
+    @if($user->id !== auth()->id())
+    <!-- Tombol Reset Password (BARU) -->
+    <button onclick='openResetPasswordModal(@json($user))' 
+        class="p-2 hover:bg-yellow-50 rounded-lg transition" title="Reset Password">
+        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+        </svg>
+    </button>
+    
+    <!-- Tombol Edit Role -->
+    <button onclick='openEditRoleOverlay(@json($user))'
+        class="p-2 hover:bg-blue-50 rounded-lg transition" title="Edit Role">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+    </button>
+    
+    <!-- Tombol Delete -->
+    <button onclick="deleteUser({{ $user->id }}, '{{ $user->name }}')"
+        class="p-2 hover:bg-red-50 rounded-lg transition" title="Hapus User">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+    </button>
+    @else
+    <button class="p-2 opacity-50 cursor-not-allowed" disabled title="Tidak dapat edit akun sendiri">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+    </button>
+    @endif
+</div>
                     </div>
 
                     <div class="space-y-2">
@@ -224,6 +236,52 @@
                 <button type="submit"
                     class="flex-1 px-4 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm">
                     Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- Modal Reset Password User -->
+<div id="resetPasswordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform transition-all">
+        <h3 class="text-xl font-bold text-gray-800 mb-1">Reset Password User</h3>
+        <p class="text-sm text-gray-600 mb-6">Masukkan password baru untuk <span id="resetUserName" class="font-semibold"></span></p>
+        
+        <form id="resetPasswordForm">
+            @csrf
+            <input type="hidden" id="resetUserId">
+            
+            <!-- Password Baru -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Password Baru <span class="text-red-500">*</span>
+                </label>
+                <input type="password" name="new_password" id="newPasswordReset" 
+                       placeholder="Minimal 8 karakter"
+                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                       required minlength="8">
+            </div>
+
+            <!-- Konfirmasi Password -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Konfirmasi Password <span class="text-red-500">*</span>
+                </label>
+                <input type="password" name="new_password_confirmation" id="newPasswordConfirmationReset" 
+                       placeholder="Ketik ulang password baru"
+                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                       required minlength="8">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3">
+                <button type="button" onclick="closeResetPasswordModal()"
+                        class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium text-sm">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-2.5 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium text-sm">
+                    Reset Password
                 </button>
             </div>
         </form>
@@ -363,6 +421,102 @@
             }
         }
     }
+    // Open Reset Password Modal
+function openResetPasswordModal(user) {
+    document.getElementById('resetUserId').value = user.id;
+    document.getElementById('resetUserName').textContent = user.name;
+    document.getElementById('resetPasswordModal').classList.remove('hidden');
+    document.getElementById('resetPasswordModal').classList.add('flex');
+}
+
+// Close Reset Password Modal
+function closeResetPasswordModal() {
+    document.getElementById('resetPasswordModal').classList.add('hidden');
+    document.getElementById('resetPasswordModal').classList.remove('flex');
+    document.getElementById('resetPasswordForm').reset();
+}
+
+// Handle Reset Password Form
+document.getElementById('resetPasswordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const userId = document.getElementById('resetUserId').value;
+    const newPassword = document.getElementById('newPasswordReset').value;
+    const confirmPassword = document.getElementById('newPasswordConfirmationReset').value;
+    
+    // Validasi client-side
+    if (newPassword.length < 8) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Password minimal 8 karakter',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        Swal.fire({
+            title: 'Perhatian!',
+            text: 'Konfirmasi password tidak cocok',
+            icon: 'warning',
+            confirmButtonColor: '#f59e0b',
+            confirmButtonText: 'OK'
+        });
+        return;
+    }
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch(`/admin/team/${userId}/reset-password`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            closeResetPasswordModal();
+            Swal.fire({
+                title: 'Berhasil!',
+                text: data.message,
+                icon: 'success',
+                confirmButtonColor: '#000000',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            Swal.fire({
+                title: 'Gagal!',
+                text: data.message,
+                icon: 'error',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'OK'
+            });
+        }
+    } catch (error) {
+        Swal.fire({
+            title: 'Gagal!',
+            text: 'Terjadi kesalahan saat mereset password',
+            icon: 'error',
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'OK'
+        });
+    }
+});
+
+// Close modal when clicking outside
+document.getElementById('resetPasswordModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeResetPasswordModal();
+    }
+});
+
 </script>
 
 @endsection

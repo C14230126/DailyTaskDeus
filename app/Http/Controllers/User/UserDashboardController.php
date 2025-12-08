@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash; 
 
 class UserDashboardController extends Controller
 {
@@ -275,15 +276,22 @@ class UserDashboardController extends Controller
             ], 500);
         }
     }
-    public function announcements()
+public function announcements()
 {
     $announcements = \App\Models\Announcement::with('creator')
+        ->orderByRaw("
+            CASE 
+                WHEN priority = 'Tinggi' THEN 1 
+                WHEN priority = 'Sedang' THEN 2 
+                WHEN priority = 'Rendah' THEN 3 
+                ELSE 999 
+            END
+        ")
         ->orderBy('created_at', 'desc')
         ->get();
 
     return view('user.announcements', compact('announcements'));
 }
-
 public function leaves()
 {
     $leaves = \App\Models\Leave::where('user_id', auth()->id())
