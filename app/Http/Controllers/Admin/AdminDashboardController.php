@@ -602,6 +602,21 @@ public function team()
     
     return view('admin.team', compact('users', 'totalUsers', 'adminCount', 'userCount'));
 }
+public function showProfile($id)
+{
+    $profileUser = User::findOrFail($id);
+    $tasks = $profileUser->assignedTasks()->orderBy('created_at', 'desc')->get();
+
+    $taskStats = [
+        'total'       => $tasks->count(),
+        'selesai'     => $tasks->where('status', 'selesai')->count(),
+        'dalam_proses'=> $tasks->where('status', 'dalam_proses')->count(),
+        'menunggu'    => $tasks->where('status', 'menunggu')->count(),
+        'terlambat'   => $tasks->where('status', 'terlambat')->count(),
+    ];
+
+    return view('admin.profile', compact('profileUser', 'tasks', 'taskStats'));
+}
 
 public function updateUserRole(Request $request, $id)
 {

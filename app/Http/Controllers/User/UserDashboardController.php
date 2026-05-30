@@ -481,6 +481,7 @@ public function updateProfile(Request $request)
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
         ], [
             'name.required' => 'Nama lengkap wajib diisi',
             'email.required' => 'Email wajib diisi',
@@ -491,6 +492,7 @@ public function updateProfile(Request $request)
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
         ]);
         
         return response()->json([
@@ -555,5 +557,31 @@ public function resetPassword(Request $request)
             'message' => 'Gagal mengubah password: ' . $e->getMessage()
         ], 500);
     }
+}
+
+public function team()
+{
+    $users = User::orderBy('name')->get();
+    $totalUsers = $users->count();
+    $adminCount = $users->where('role', 'admin')->count();
+    $userCount  = $users->where('role', 'user')->count();
+
+    return view('user.team', compact('users', 'totalUsers', 'adminCount', 'userCount'));
+}
+
+public function showProfile($id)
+{
+    $profileUser = User::findOrFail($id);
+    $tasks = $profileUser->assignedTasks()->orderBy('created_at', 'desc')->get();
+
+    $taskStats = [
+        'total'        => $tasks->count(),
+        'selesai'      => $tasks->where('status', 'selesai')->count(),
+        'dalam_proses' => $tasks->where('status', 'dalam_proses')->count(),
+        'menunggu'     => $tasks->where('status', 'menunggu')->count(),
+        'terlambat'    => $tasks->where('status', 'terlambat')->count(),
+    ];
+
+    return view('user.profile', compact('profileUser', 'tasks', 'taskStats'));
 }
 }

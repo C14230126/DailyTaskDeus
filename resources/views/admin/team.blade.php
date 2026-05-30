@@ -144,6 +144,16 @@
                         </div>
                         <div class="flex items-center gap-2">
     @if($user->id !== auth()->id())
+
+    <!-- Tombol Lihat Profil -->
+    <a href="{{ route('admin.team.profile', $user->id) }}"
+    class="p-2 hover:bg-blue-50 rounded-lg transition" title="Lihat Profil">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+    </a>
+
     <!-- Tombol Reset Password (BARU) -->
     <button onclick='openResetPasswordModal(@json($user))' 
         class="p-2 hover:bg-yellow-50 rounded-lg transition" title="Reset Password">

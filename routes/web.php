@@ -37,6 +37,7 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::post('/dashboard/task/{task}/approve', [AdminDashboardController::class, 'approveTask'])->name('admin.dashboard.approveTask');
     Route::delete('/all-tasks/{task}', [AdminDashboardController::class, 'destroyTask'])->name('admin.all-tasks.destroy');
     Route::get('/team', [AdminDashboardController::class, 'team'])->name('admin.team');
+    Route::get('/team/{id}', [AdminDashboardController::class, 'showProfile'])->name('admin.team.profile');
     Route::put('/team/{id}/role', [AdminDashboardController::class, 'updateUserRole'])->name('admin.team.updateRole');
     Route::delete('/team/{id}', [AdminDashboardController::class, 'destroyUser'])->name('admin.team.destroy');
     Route::post('/team/{id}/reset-password', [AdminDashboardController::class, 'resetUserPassword'])->name('admin.team.reset-password');
@@ -68,6 +69,10 @@ Route::middleware('user')->prefix('user')->group(function () {
     Route::get('/settings', [UserDashboardController::class, 'settings'])->name('user.settings');
     Route::put('/settings/profile', [UserDashboardController::class, 'updateProfile'])->name('user.settings.updateProfile');
     Route::post('/settings/reset-password', [UserDashboardController::class, 'resetPassword'])->name('user.settings.resetPassword');
+    // Tim & Profil
+    Route::get('/team', [UserDashboardController::class, 'team'])->name('user.team');
+    Route::get('/team/{id}', [UserDashboardController::class, 'showProfile'])->name('user.team.profile');
+    Route::put('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
 });
 
 // Logout route (accessible by both admin and user)
