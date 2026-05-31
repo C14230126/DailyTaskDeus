@@ -52,6 +52,12 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
         'update' => 'admin.tasks.update',
         'destroy' => 'admin.tasks.destroy',
     ]);
+    // Recurring Tasks
+    Route::get('/recurring', [AdminDashboardController::class, 'recurring'])->name('admin.recurring');
+    Route::post('/recurring', [AdminDashboardController::class, 'storeRecurring'])->name('admin.recurring.store');
+    Route::put('/recurring/{id}', [AdminDashboardController::class, 'updateRecurring'])->name('admin.recurring.update');
+    Route::post('/recurring/{id}/toggle', [AdminDashboardController::class, 'toggleRecurring'])->name('admin.recurring.toggle');
+    Route::delete('/recurring/{id}', [AdminDashboardController::class, 'destroyRecurring'])->name('admin.recurring.destroy');
 });
 
 // User routes

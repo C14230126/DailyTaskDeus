@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\RecurringTask;
 
 class AdminDashboardController extends Controller
 {
@@ -809,6 +810,81 @@ public function resetUserPassword(Request $request, $id)
             'success' => false,
             'message' => 'Gagal mereset password: ' . $e->getMessage()
         ], 500);
+    }
+}
+
+public function recurring()
+{
+    $recurringTasks = RecurringTask::with('assignedUser')->orderBy('created_at', 'desc')->get();
+    $users = User::orderBy('name')->get();
+    return view('admin.recurring', compact('recurringTasks', 'users'));
+}
+
+public function storeRecurring(Request $request)
+{
+    try {
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'assigned_to' => 'required|exists:users,id',
+            'priority'    => 'required|in:Sedang,Tinggi',
+        ]);
+
+        RecurringTask::create([
+            'title'       => $request->title,
+            'description' => $request->description,
+            'priority'    => $request->priority,
+            'assigned_to' => $request->assigned_to,
+            'created_by'  => Auth::id(),
+            'is_active'   => true,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Template berhasil ditambahkan!']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
+
+public function updateRecurring(Request $request, $id)
+{
+    try {
+        $rt = RecurringTask::findOrFail($id);
+        $request->validate([
+            'title'       => 'required|string|max:255',
+            'assigned_to' => 'required|exists:users,id',
+            'priority'    => 'required|in:Sedang,Tinggi',
+        ]);
+
+        $rt->update([
+            'title'       => $request->title,
+            'description' => $request->description,
+            'priority'    => $request->priority,
+            'assigned_to' => $request->assigned_to,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Template berhasil diupdate!']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
+
+public function toggleRecurring($id)
+{
+    try {
+        $rt = RecurringTask::findOrFail($id);
+        $rt->update(['is_active' => !$rt->is_active]);
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
+
+public function destroyRecurring($id)
+{
+    try {
+        RecurringTask::findOrFail($id)->delete();
+        return response()->json(['success' => true, 'message' => 'Template berhasil dihapus!']);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
 }
