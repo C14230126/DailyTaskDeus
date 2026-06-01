@@ -887,4 +887,24 @@ public function destroyRecurring($id)
         return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
     }
 }
+
+public function calendar()
+{
+    $tasks = \App\Models\Task::with('assignedUser')
+        ->whereNotNull('due_date')
+        ->get();
+
+    $taskData = [];
+    foreach ($tasks as $task) {
+        $dateStr = $task->due_date->format('Y-m-d');
+        $taskData[$dateStr][] = [
+            'title'     => $task->title,
+            'status'    => $task->status,
+            'priority'  => $task->priority,
+            'user_name' => $task->assignedUser?->name ?? 'Tidak ada',
+        ];
+    }
+
+    return view('admin.calendar', compact('taskData'));
+}
 }

@@ -58,6 +58,7 @@ Route::middleware(['user', 'admin'])->prefix('admin')->group(function () {
     Route::put('/recurring/{id}', [AdminDashboardController::class, 'updateRecurring'])->name('admin.recurring.update');
     Route::post('/recurring/{id}/toggle', [AdminDashboardController::class, 'toggleRecurring'])->name('admin.recurring.toggle');
     Route::delete('/recurring/{id}', [AdminDashboardController::class, 'destroyRecurring'])->name('admin.recurring.destroy');
+    Route::get('/calendar', [AdminDashboardController::class, 'calendar'])->name('admin.calendar');
 });
 
 // User routes
@@ -79,6 +80,7 @@ Route::middleware('user')->prefix('user')->group(function () {
     Route::get('/team', [UserDashboardController::class, 'team'])->name('user.team');
     Route::get('/team/{id}', [UserDashboardController::class, 'showProfile'])->name('user.team.profile');
     Route::put('/profile/update', [UserDashboardController::class, 'updateProfile'])->name('user.profile.update');
+    Route::get('/calendar', [UserDashboardController::class, 'calendar'])->name('user.calendar');
 });
 
 // Logout route (accessible by both admin and user)

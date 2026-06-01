@@ -584,4 +584,25 @@ public function showProfile($id)
 
     return view('user.profile', compact('profileUser', 'tasks', 'taskStats'));
 }
+
+public function calendar()
+{
+    $user  = Auth::user();
+    $tasks = \App\Models\Task::where('assigned_to', $user->id)
+        ->whereNotNull('due_date')
+        ->get();
+
+    $taskData = [];
+    foreach ($tasks as $task) {
+        $dateStr = $task->due_date->format('Y-m-d');
+        $taskData[$dateStr][] = [
+            'title'       => $task->title,
+            'status'      => $task->status,
+            'priority'    => $task->priority,
+            'description' => $task->description,
+        ];
+    }
+
+    return view('user.calendar', compact('taskData'));
+}
 }
