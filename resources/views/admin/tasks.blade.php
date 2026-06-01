@@ -605,7 +605,7 @@
         document.getElementById('editTaskAssignedTo').value = task.assigned_to;
         document.getElementById('editTaskStatus').value = task.status;
         document.getElementById('editTaskPriority').value = task.priority;
-        document.getElementById('editTaskDueDate').value = task.due_date;
+        document.getElementById('editTaskDueDate').value = task.due_date ? task.due_date.substring(0, 10) : '';
         
         document.getElementById('editTaskOverlay').classList.remove('hidden');
         document.getElementById('editTaskOverlay').classList.add('flex');

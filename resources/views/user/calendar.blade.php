@@ -91,9 +91,6 @@
                 <div class="flex items-center gap-2 text-sm text-gray-600">
                     <div class="w-3 h-3 rounded-full bg-blue-500"></div> Ada task
                 </div>
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div> Hari ini
-                </div>
             </div>
         </div>
     </div>
@@ -138,8 +135,8 @@ function renderCalendar() {
 
         grid.insertAdjacentHTML('beforeend', `
             <div onclick="openDay('${dateStr}')"
-                class="flex flex-col items-center py-2 rounded-lg cursor-pointer hover:bg-gray-50 transition
-                ${isToday ? 'bg-yellow-50 ring-2 ring-yellow-400' : ''}">
+                class="flex flex-col items-center py-2 rounded-lg cursor-pointer hover:bg-gray-200 transition
+                ${isToday ? 'bg-yellow-50 ring-2 ring-yellow-400' : 'bg-gray-50'}">
                 <span class="text-sm ${isToday ? 'font-bold text-yellow-600' : 'text-gray-700'}">${d}</span>
                 ${dotHtml}
             </div>

@@ -103,9 +103,6 @@
                 <div class="flex items-center gap-2 text-sm text-gray-600">
                     <div class="w-3 h-3 rounded-full bg-red-500"></div> Ada yang belum selesai
                 </div>
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div> Hari ini
-                </div>
             </div>
         </div>
     </div>
@@ -161,8 +158,8 @@ function renderCalendar() {
 
         grid.insertAdjacentHTML('beforeend', `
             <div onclick="openDay('${dateStr}')"
-                class="relative flex flex-col items-center justify-start py-2 rounded-lg cursor-pointer transition hover:bg-gray-50
-                ${isToday ? 'bg-yellow-50 ring-2 ring-yellow-400' : ''}">
+                class="relative flex flex-col items-center justify-start py-2 rounded-lg cursor-pointer transition hover:bg-gray-200
+                ${isToday ? 'bg-yellow-50 ring-2 ring-yellow-400' : 'bg-gray-50'}">
                 <span class="text-sm ${isToday ? 'font-bold text-yellow-600' : 'text-gray-700'}">${d}</span>
                 ${dotHtml}
             </div>
